@@ -75,10 +75,9 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select * from PUBLIC.@{activity('Read Table Details').output.firstRow.source_table_name}",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
+						"type": "PostgreSqlV2Source",
+						"query": "select * from PUBLIC.@{activity('Read Table Details').output.firstRow.source_table_name}",
+						"queryTimeout": "02:00:00"
 					},
 					"sink": {
 						"type": "ParquetSink",
@@ -101,7 +100,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "AzureSqlTable1",
+						"referenceName": "PostgreSqlTable",
 						"type": "DatasetReference"
 					}
 				],
