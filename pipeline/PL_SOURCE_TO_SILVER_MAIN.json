@@ -30,12 +30,55 @@
 					},
 					"firstRowOnly": false
 				}
+			},
+			{
+				"name": "Ingest All Tables",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Read Source Table List",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Read Source Table List').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Set Variable",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Test",
+								"value": {
+									"value": "@item().table_id",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
 			}
 		],
 		"parameters": {
 			"source_system": {
 				"type": "string",
 				"defaultValue": "neon_postgres"
+			}
+		},
+		"variables": {
+			"Test": {
+				"type": "String"
 			}
 		},
 		"annotations": []
