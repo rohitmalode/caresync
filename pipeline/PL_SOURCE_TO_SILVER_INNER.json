@@ -126,12 +126,6 @@
 			"table_id": {
 				"type": "string",
 				"defaultValue": "1"
-			},
-			"container": {
-				"type": "string"
-			},
-			"folder": {
-				"type": "string"
 			}
 		},
 		"variables": {
