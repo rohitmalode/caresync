@@ -406,12 +406,7 @@
 											"type": "BinarySource",
 											"storeSettings": {
 												"type": "AzureBlobFSReadSettings",
-												"recursive": false,
-												"modifiedDatetimeStart": {
-													"value": "@variables('watermark_value')",
-													"type": "Expression"
-												},
-												"deleteFilesAfterCompletion": false
+												"recursive": true
 											},
 											"formatSettings": {
 												"type": "BinaryReadSettings"
