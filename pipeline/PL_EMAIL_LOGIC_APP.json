@@ -42,7 +42,116 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "body_header",
-					"value": ""
+					"value": "Ingestion and Transformation process for caresync project has been completed and below is there status:"
+				}
+			},
+			{
+				"name": "Prepare Email Body Footer",
+				"description": "For any support reach out to: itsupport10@gmail.com",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "body_footer",
+					"value": "For any support reach out to itsupport10@gmail.com"
+				}
+			},
+			{
+				"name": "Create Email Subject",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Check Overall Failed Count",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "email_subject",
+					"value": {
+						"value": "@{pipeline().globalParameters.env} | @{if(greater(activity('Check Overall Failed Count').output.firstRow.count,0),'FAILED','SUCCESS')} | CARESYNC MASTER RUN",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Check Overall Failed Count",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select count(*) as count from ctrl.audit_log\nwhere adf_run_id='@{pipeline().parameters.adf_run_id}'\nand status != 'SUCCESS'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Prepare Logic Apps Body",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Create Email Subject",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Prepare Email Body Footer",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Read All Table Status",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Prepare Email Body Header",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "logic_apps_body",
+					"value": {
+						"value": "{\n  \"subject\": \"@{variables('email_subject')} | SUCCESS | CARESYNC MASTER RUN\",\n  \"email_recipients\": \"@{pipeline().globalParameters.email_recipients}\",\n  \"body_header\": \"@{variables('body_header')}\",\n  \"body_footer\": \"@{variables('body_footer')}\",\n  \"status_table\": activity('Read All Table Status').output.value\n}",
+						"type": "Expression"
+					}
 				}
 			}
 		],
@@ -54,6 +163,15 @@
 		},
 		"variables": {
 			"body_header": {
+				"type": "String"
+			},
+			"email_subject": {
+				"type": "String"
+			},
+			"logic_apps_body": {
+				"type": "String"
+			},
+			"body_footer": {
 				"type": "String"
 			}
 		},
