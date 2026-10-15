@@ -149,7 +149,38 @@
 				"typeProperties": {
 					"variableName": "logic_apps_body",
 					"value": {
-						"value": "{\n  \"subject\": \"@{variables('email_subject')} | SUCCESS | CARESYNC MASTER RUN\",\n  \"email_recipients\": \"@{pipeline().globalParameters.email_recipients}\",\n  \"body_header\": \"@{variables('body_header')}\",\n  \"body_footer\": \"@{variables('body_footer')}\",\n  \"status_table\": activity('Read All Table Status').output.value\n}",
+						"value": "{\n  \"subject\": \"@{variables('email_subject')} | SUCCESS | CARESYNC MASTER RUN\",\n  \"email_recipients\": \"@{pipeline().globalParameters.email_recipients}\",\n  \"body_header\": \"@{variables('body_header')}\",\n  \"body_footer\": \"@{variables('body_footer')}\",\n  \"status_table\": @{string(activity('Read All Table Status').output.value)}\n}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Send Email",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Prepare Logic Apps Body",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"url": {
+						"value": "@pipeline().globalParameters.logic_apps_url",
+						"type": "Expression"
+					},
+					"body": {
+						"value": "@variables('logic_apps_body')",
 						"type": "Expression"
 					}
 				}
