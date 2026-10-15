@@ -1,0 +1,12 @@
+{
+	"name": "adf-rohit-caresync",
+	"properties": {
+		"globalParameters": {
+			"email_recipients": {
+				"type": "string",
+				"value": "vyawhareyash@gmail.com"
+			}
+		}
+	},
+	"location": "eastasia"
+}
